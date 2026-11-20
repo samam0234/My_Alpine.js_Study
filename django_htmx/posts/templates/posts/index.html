@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Django + HTMX + Alpine</title>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.17.5/dist/cdn.min.js"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    body { font-family: sans-serif; margin: 2rem; }
+    article { border-top: 1px solid #ccc; padding: 0.5rem 0; }
+    input, textarea, button { font: inherit; margin: 0.25rem 0; }
+  </style>
+</head>
+<body>
+  <div x-data="{ menu: false, composer: false }" x-cloak>
+    <button type="button" @click="menu = !menu">검색 열기</button>
+    <div x-show="menu">
+      <label>
+        제목 검색
+        <input name="q" placeholder="제목"
+               hx-get="{% url 'post-list' %}"
+               hx-trigger="keyup changed delay:300ms"
+               hx-target="#post-list"
+               hx-swap="innerHTML">
+      </label>
+    </div>
+    <button type="button" @click="composer = !composer" x-text="composer ? '작성 닫기' : '글 작성'"></button>
+    <form x-show="composer"
+          hx-post="{% url 'post-create' %}"
+          hx-target="#post-list"
+          hx-swap="innerHTML"
+          @htmx:after-request.camel="if ($event.detail.successful) composer = false">
+      {% csrf_token %}
+      <label>제목 <input name="title"></label>
+      <label>본문 <textarea name="body"></textarea></label>
+      <button type="submit">등록</button>
+    </form>
+    <div id="post-list">
+      {% include "posts/_list.html" %}
+    </div>
+  </div>
+</body>
+</html>

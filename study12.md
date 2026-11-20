@@ -85,6 +85,18 @@ Alpine 공식 플러그인과 `Alpine.data` UI 부품으로 열림, 포커스, �
 
 `shell.theme`는 화면 선호일 뿐 API와 무관하다. 작성 폼의 오류 포커스는 `x-ref`로 첫 오류 필드에 `$refs.title.focus()`를 호출해 study5와 잇는다. 목록 데이터는 study11의 `listPosts` 결과를 그대로 쓰고, 플러그인 상태에 글을 저장하지 않는다. 운영 배포 목록에 플러그인 URL 세 개가 더 생긴다. 자체 호스팅으로 바꿀 때도 파일 버전은 3.17.5로 맞춘다.
 
+### Django + HTMX 화면
+
+`django_htmx/`는 Django 템플릿 게시판이다. HTMX 2.0.4가 `hx-get`, `hx-post`, `hx-target="#post-list"`, `hx-swap="innerHTML"`으로 목록만 바꾼다. Alpine 3.17.5는 같은 페이지에서 검색 칸과 작성 폼을 열고 닫는다. `x-data`는 `#post-list`의 부모에 있어서 목록 HTML이 바뀌어도 열림 상태가 유지된다. 작성 폼은 `{% csrf_token %}`을 포함하고, 등록이 성공하면 `@htmx:after-request.camel`이 폼을 닫는다. 제목과 본문은 Django가 이스케이프한다.
+
+```powershell
+cd django_htmx
+python manage.py test
+python manage.py runserver 127.0.0.1:8000
+```
+
+주소는 `http://127.0.0.1:8000`이다. Node 게시판 `127.0.0.1:5500`과 포트를 나누어 둔다.
+
 ## ⑤ 오류 노트
 
 | 증상 | 원인 | 해결 |
@@ -95,12 +107,15 @@ Alpine 공식 플러그인과 `Alpine.data` UI 부품으로 열림, 포커스, �
 | 모달 밖이 계속 탭됨 | `x-trap`을 항상 거짓인 요소에 둠 | 열린 노드에 `x-trap="open"` |
 | 테마 키에 토큰이 섞임 | `$persist`에 세션 객체를 넣음 | 테마 문자열만 저장한다 |
 | 마스크를 통과했다고 서버가 거절 | 표시 형식과 검증을 같은 것으로 봄 | `validatePost`와 서버 `fields`를 유지한다 |
+| Django 글 등록이 403 | 폼에 CSRF 토큰이 없음 | `{% csrf_token %}`을 `hx-post` 폼 안에 둔다 |
+| 목록을 바꾼 뒤 검색 창이 닫힘 | `x-data`가 교체되는 조각 안에 있음 | 상태 요소를 `#post-list` 밖에 둔다 |
 
 ## ⑥ 직접 해보기
 
 1. 테마를 바꾼 뒤 새로고침해 복원되는지, Application 패널의 값에 토큰이 없는지 본다.
 2. 대화상자를 연 상태에서 Tab을 눌러 닫기 버튼 밖으로 나가지 않는지 확인한다.
 3. 플러그인 스크립트 하나의 버전만 `3.17.4`로 바꿔 깨지는 증상을 본 뒤 3.17.5로 되돌린다.
+4. `http://127.0.0.1:8000`에서 검색 열기와 글 작성을 눌러 목록만 바뀌는지, 창을 닫아도 목록이 남는지 본다.
 
 ## ⑦ ☐ 체크리스트
 
@@ -110,6 +125,7 @@ Alpine 공식 플러그인과 `Alpine.data` UI 부품으로 열림, 포커스, �
 - [ ] 모달은 `x-if`와 `x-trap`을 함께 쓴다
 - [ ] `x-collapse`가 `x-show`와 같은 요소에 있다
 - [ ] 목록 JSON 구조는 UI 상태와 분리되어 있다
+- [ ] Django + HTMX 화면에 Alpine을 함께 붙여보기
 
 ## ⑧ 다음 단계
 

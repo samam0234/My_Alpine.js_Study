@@ -34,6 +34,8 @@ Alpine.js **3.17.5** 하나만 다루는 학습 문서다. 서버가 만든 HTML
 
 실행은 저장소 루트에서 `node server/server.mjs`다. 게시판은 [http://127.0.0.1:5500](http://127.0.0.1:5500), 심화 화면은 [final.html](final.html), 단계 예제는 [examples](examples)에 있다. 기본 계정은 `mina@example.com` / `password123`이다. `file://`로 열면 `fetch`와 모듈이 막힌다. `node --test`로 순수 함수, HTTP, MCP 검색을 확인한다.
 
+Django + HTMX 화면은 `django_htmx`에서 `python manage.py test` 다음 `python manage.py runserver 127.0.0.1:8000`이다. 주소는 [http://127.0.0.1:8000](http://127.0.0.1:8000)이다. HTMX가 목록을 바꾸고 Alpine이 검색과 작성 창을 연다.
+
 ## 원문 체크 항목을 넣은 곳
 
 | 원문 | 문서 |
@@ -43,5 +45,4 @@ Alpine.js **3.17.5** 하나만 다루는 학습 문서다. 서버가 만든 HTML
 | 모달·드롭다운·탭 컴포넌트 | study2 |
 | `fetch` 로 게시판 API 목록 불러오기 (`x-init`) | study6 |
 | `Alpine.store` 로 전역 상태(로그인 사용자) | study7 |
-
-`Django + HTMX 화면에 Alpine을 함께 붙여보기`는 다른 프레임워크와 통합하지 않는다는 조건 때문에 체크리스트에 넣지 않았다.
+| `Django + HTMX 화면에 Alpine을 함께 붙여보기` | study12 |
