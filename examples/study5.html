@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>study5 폼</title>
+  <link rel="stylesheet" href="/css/app.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.17.5/dist/cdn.min.js"></script>
+  <script>
+    function validate(form) {
+      const fields = {}
+      if (form.title.length < 1 || form.title.length > 200) fields.title = ['1~200자로 입력하세요.']
+      if (form.body.length < 1) fields.body = ['본문을 입력하세요.']
+      return fields
+    }
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('writer', () => ({
+        form: { title: '', body: '' },
+        errors: {},
+        formError: '',
+        submitting: false,
+        async submit() {
+          if (this.submitting) return
+          this.errors = validate(this.form)
+          this.formError = ''
+          if (Object.keys(this.errors).length) return
+          this.submitting = true
+          try {
+            const response = await fetch('/api/posts', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({ title: this.form.title, body: this.form.body, tags: [] })
+            })
+            const body = await response.json().catch(() => ({}))
+            if (response.status === 201 || response.status === 200) {
+              this.formError = '등록했습니다.'
+              this.form = { title: '', body: '' }
+              return
+            }
+            if ((response.status === 400 || response.status === 422) && body.error?.fields) {
+              this.errors = body.error.fields
+              this.formError = body.error.message || ''
+              return
+            }
+            this.formError = body.error?.message || '요청을 처리하지 못했습니다.'
+          } finally {
+            this.submitting = false
+          }
+        }
+      }))
+    })
+  </script>
+</head>
+<body>
+  <form x-data="writer" @submit.prevent="submit()">
+    <p class="error" x-show="formError" x-text="formError"></p>
+    <label>제목 <input x-model.trim="form.title"></label>
+    <p class="error" x-show="errors.title" x-text="errors.title ? errors.title[0] : ''"></p>
+    <label>본문 <textarea x-model.trim="form.body"></textarea></label>
+    <p class="error" x-show="errors.body" x-text="errors.body ? errors.body[0] : ''"></p>
+    <button type="submit" :disabled="submitting">등록</button>
+  </form>
+</body>
+</html>

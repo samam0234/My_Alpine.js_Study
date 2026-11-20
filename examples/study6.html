@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>study6 목록</title>
+  <link rel="stylesheet" href="/css/app.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.17.5/dist/cdn.min.js"></script>
+</head>
+<body>
+  <div x-data="{ posts: [], q: '', message: '' }"
+       x-init="try { posts = (await (await fetch('/api/posts')).json()).data } catch (error) { message = error.message }">
+    <p class="error" x-text="message"></p>
+    <input x-model="q" placeholder="검색">
+    <template x-for="post in posts.filter(post => post.title.includes(q))" :key="post.id">
+      <p x-text="post.title"></p>
+    </template>
+  </div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>study7 로그인</title>
+  <link rel="stylesheet" href="/css/app.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.17.5/dist/cdn.min.js"></script>
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.store('auth', {
+        user: null,
+        token: '',
+        setSession(data) { this.user = data.user; this.token = data.accessToken || '' },
+        clear() { this.user = null; this.token = '' }
+      })
+      Alpine.data('loginForm', () => ({
+        email: '',
+        password: '',
+        message: '',
+        async login() {
+          this.message = ''
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ email: this.email, password: this.password })
+          })
+          const body = await response.json().catch(() => ({}))
+          this.password = ''
+          if (!response.ok) { this.message = body.error?.message || '로그인하지 못했습니다.'; return }
+          Alpine.store('auth').setSession(body.data)
+        }
+      }))
+    })
+  </script>
+</head>
+<body>
+  <p x-data>
+    <span x-show="$store.auth.user" x-text="$store.auth.user ? $store.auth.user.nickname : ''"></span>
+    <span x-show="!$store.auth.user">로그인 전</span>
+  </p>
+  <form x-data="loginForm" @submit.prevent="login()" x-show="!$store.auth.user">
+    <label>이메일 <input type="email" x-model.trim="email" autocomplete="username"></label>
+    <label>비밀번호 <input type="password" x-model="password" autocomplete="current-password"></label>
+    <button type="submit">로그인</button>
+    <p x-text="message"></p>
+  </form>
+</body>
+</html>

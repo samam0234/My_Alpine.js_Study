@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>study18 발췌 질문</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <form x-data="docAsk" @submit.prevent="ask()" x-cloak>
+    <label>문서 <textarea x-model="documentText"></textarea></label>
+    <label>질문 <input x-model.trim="question"></label>
+    <button type="submit">질문</button>
+    <pre x-text="answer"></pre>
+  </form>
+  <p>로그인 후 스트림은 <a href="/final.html#/ask">final.html</a>에서 받습니다. 이 페이지는 키 없이 발췌만 고릅니다.</p>
+  <script type="module">
+    import Alpine from 'https://cdn.jsdelivr.net/npm/alpinejs@3.17.5/dist/module.esm.js'
+    import { answerFromExcerpts, excerpts } from '/js/pure.mjs'
+    Alpine.data('docAsk', () => ({
+      documentText: '알파 설명\n\n베타만 있는 문단',
+      question: '',
+      answer: '',
+      used: [],
+      ask() {
+        this.used = excerpts(this.documentText, this.question)
+        this.answer = answerFromExcerpts(this.used)
+      }
+    }))
+    window.Alpine = Alpine
+    Alpine.start()
+  </script>
+</body>
+</html>

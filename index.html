@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Alpine 게시판</title>
+  <link rel="stylesheet" href="/css/app.css">
+  <script type="module" src="/js/boot.js"></script>
+</head>
+<body x-data="router" x-cloak>
+  <header>
+    <a href="#/posts">게시판</a>
+    <a href="/final.html">심화</a>
+    <a href="/examples/study1.html">예제</a>
+    <span x-show="$store.auth.user" x-text="$store.auth.user ? $store.auth.user.nickname : ''"></span>
+    <a x-show="$store.auth.user" href="#/write">글쓰기</a>
+    <button type="button" x-show="$store.auth.user" @click="logout()">로그아웃</button>
+    <a x-show="!$store.auth.user" href="#/login">로그인</a>
+    <a x-show="!$store.auth.user" href="#/signup">회원가입</a>
+  </header>
+  <main>
+    <template x-if="route.name === 'list'">
+      <section x-data="postList" x-init="load()">
+        <label>검색 <input x-model="q" @input="schedule()" placeholder="제목·본문"></label>
+        <p class="error" x-show="message" x-text="message"></p>
+        <template x-for="post in posts" :key="post.id">
+          <article>
+            <h2><a :href="'#/posts/' + post.id" x-text="post.title"></a></h2>
+            <p>
+              <span x-text="post.author.nickname"></span>
+              · 댓글 <span x-text="post.commentCount"></span>
+            </p>
+          </article>
+        </template>
+        <div class="row">
+          <button type="button" @click="Alpine.store('httpCache').clear(); load(meta.page - 1)" :disabled="meta.page <= 1">이전</button>
+          <span x-text="meta.page + ' / ' + meta.totalPages"></span>
+          <button type="button" @click="Alpine.store('httpCache').clear(); load(meta.page + 1)" :disabled="meta.page >= meta.totalPages">다음</button>
+        </div>
+      </section>
+    </template>
+
+    <template x-if="route.name === 'detail'">
+      <section x-data="postDetail">
+        <p class="error" x-show="message" x-text="message"></p>
+        <template x-if="missing"><p>글을 찾을 수 없습니다. <a href="#/posts">목록</a></p></template>
+        <template x-if="post">
+          <article>
+            <h1 x-text="post.title"></h1>
+            <p x-text="post.body"></p>
+            <p x-text="post.author.nickname + ' · ' + post.createdAt"></p>
+            <div class="row" x-show="mine(post.author.id)">
+              <a class="button" :href="'#/write?id=' + post.id">수정</a>
+              <button type="button" @click="remove()">삭제</button>
+            </div>
+            <h2>댓글</h2>
+            <template x-for="item in comments" :key="item.id">
+              <p>
+                <span x-text="item.author.nickname + ': ' + item.body"></span>
+                <button type="button" x-show="mine(item.author.id)" @click="removeComment(item.id)">삭제</button>
+              </p>
+            </template>
+            <form @submit.prevent="addComment()" x-show="$store.auth.user">
+              <label>댓글 <textarea x-model.trim="comment"></textarea></label>
+              <button type="submit">댓글 등록</button>
+            </form>
+          </article>
+        </template>
+      </section>
+    </template>
+
+    <template x-if="route.name === 'write'">
+      <form x-data="writer" @submit.prevent="submit()">
+        <h1 x-text="editingId ? '글 수정' : '글 작성'"></h1>
+        <p class="error" x-show="formError" x-text="formError"></p>
+        <label>제목 <input x-model.trim="form.title" :aria-invalid="Boolean(errors.title)"></label>
+        <p class="error" x-show="errors.title" x-text="errors.title ? errors.title[0] : ''"></p>
+        <label>본문 <textarea x-model.trim="form.body"></textarea></label>
+        <p class="error" x-show="errors.body" x-text="errors.body ? errors.body[0] : ''"></p>
+        <button type="submit" :disabled="submitting" x-text="submitting ? '보내는 중' : '등록'"></button>
+      </form>
+    </template>
+
+    <template x-if="route.name === 'login'">
+      <form x-data="loginForm" @submit.prevent="login()">
+        <h1>로그인</h1>
+        <label>이메일 <input type="email" x-model.trim="email" autocomplete="username"></label>
+        <label>비밀번호 <input type="password" x-model="password" autocomplete="current-password"></label>
+        <button type="submit">로그인</button>
+        <p class="error" x-text="message"></p>
+      </form>
+    </template>
+
+    <template x-if="route.name === 'signup'">
+      <form x-data="signupForm" @submit.prevent="signup()">
+        <h1>회원가입</h1>
+        <label>이메일 <input type="email" x-model.trim="email" autocomplete="username"></label>
+        <label>닉네임 <input x-model.trim="nickname"></label>
+        <label>비밀번호 <input type="password" x-model="password" autocomplete="new-password"></label>
+        <button type="submit">가입</button>
+        <p class="error" x-text="message"></p>
+      </form>
+    </template>
+
+    <template x-if="route.name === 'notfound'">
+      <section>
+        <h1>페이지를 찾을 수 없습니다</h1>
+        <p x-text="route.path"></p>
+        <a href="#/posts">목록으로</a>
+      </section>
+    </template>
+  </main>
+</body>
+</html>

@@ -32,7 +32,7 @@ Alpine.js **3.17.5** 하나만 다루는 학습 문서다. 서버가 만든 HTML
 | [study18.md](study18.md) | AI 스트리밍 UI, 프롬프트, MCP 개념, DocuForge형 발췌 인용 |
 | [studyfinal.md](studyfinal.md) | 심화까지 합친 Alpine 단일 서비스 설계 |
 
-각 학습 문서의 실행 예제는 해당 파일의 HTML 코드 블록이다. 블록을 `index.html`로 저장한 뒤 study0의 개발 서버로 연다. `file://`로 열면 `fetch`와 모듈이 막힌다.
+실행은 저장소 루트에서 `node server/server.mjs`다. 게시판은 [http://127.0.0.1:5500](http://127.0.0.1:5500), 심화 화면은 [final.html](final.html), 단계 예제는 [examples](examples)에 있다. 기본 계정은 `mina@example.com` / `password123`이다. `file://`로 열면 `fetch`와 모듈이 막힌다. `node --test`로 순수 함수, HTTP, MCP 검색을 확인한다.
 
 ## 원문 체크 항목을 넣은 곳
 

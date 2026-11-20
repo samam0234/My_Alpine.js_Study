@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>study1 Hello</title>
+  <link rel="stylesheet" href="/css/app.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.17.5/dist/cdn.min.js"></script>
+</head>
+<body>
+  <div x-data="{ name: 'Alpine', count: 0, open: true }" x-cloak>
+    <h1 x-text="'안녕, ' + name"></h1>
+    <p x-show="open">이 문장은 open이 참일 때만 보입니다.</p>
+    <button type="button" x-on:click="count = count + 1">x-on으로 증가</button>
+    <button type="button" @click="open = !open">@click으로 토글</button>
+    <p x-text="'클릭 수 ' + count"></p>
+    <label>이름 <input x-model="name"></label>
+  </div>
+  <p><a href="/examples/study0.html">study0</a> · <a href="/">게시판</a></p>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Alpine 심화</title>
+  <link rel="stylesheet" href="/css/app.css">
+  <script type="module" src="/js/boot.js"></script>
+</head>
+<body x-data="shell" :data-theme="theme" x-cloak>
+  <header>
+    <a href="/">게시판</a>
+    <a href="#/posts">실시간</a>
+    <a href="#/ask">문서 질문</a>
+    <a href="#/extras">외부 요청</a>
+    <button type="button" @click="theme = theme === 'light' ? 'dark' : 'light'" x-text="theme"></button>
+    <span x-show="$store.auth.user" x-text="$store.auth.user ? $store.auth.user.nickname : ''"></span>
+    <a x-show="!$store.auth.user" href="/#/login">로그인</a>
+  </header>
+  <main>
+    <template x-if="route.name === 'list'">
+      <section x-data="liveBoard">
+        <p>소켓 <span x-text="status"></span></p>
+        <button type="button" @click="load()">목록 새로고침</button>
+        <template x-for="post in posts" :key="post.id">
+          <article><h2 x-text="post.title"></h2></article>
+        </template>
+      </section>
+    </template>
+    <template x-if="route.name === 'ask'">
+      <section x-data="docAsk" x-init="loadPosts()">
+        <h1>문서 질문</h1>
+        <p>발췌에 있는 내용만 답합니다. 로그인 전에는 브라우저 안에서만 고르고, 로그인 후에는 같은 규칙의 스트림을 받습니다.</p>
+        <label>문서 <textarea x-model="documentText" maxlength="8000" placeholder="문단은 빈 줄로 나눕니다."></textarea></label>
+        <label>질문 <input x-model.trim="question" maxlength="2000"></label>
+        <button type="button" @click="ask()" :disabled="busy || !question" x-text="busy ? '답하는 중' : '질문'"></button>
+        <pre x-text="answer"></pre>
+        <ol>
+          <template x-for="(chunk, index) in used" :key="index">
+            <li x-text="chunk"></li>
+          </template>
+        </ol>
+        <h2>공개 글 검색</h2>
+        <template x-for="post in searchPosts(question)" :key="post.id">
+          <p x-text="post.id + ' ' + post.title"></p>
+        </template>
+      </section>
+    </template>
+    <template x-if="route.name === 'extras'">
+      <section x-data="extras">
+        <h1>업로드 · 메일 · 결제</h1>
+        <p class="error" x-show="message" x-text="message"></p>
+        <input type="file" accept=".txt,.md,text/plain" @change="readFile($event)">
+        <pre x-text="preview"></pre>
+        <div class="row">
+          <button type="button" @click="upload()" :disabled="busy || !selected">업로드</button>
+          <button type="button" @click="askMail()" :disabled="busy">안내 메일 요청</button>
+          <button type="button" @click="startCheckout()" :disabled="busy">결제로 이동</button>
+        </div>
+        <p><a href="/api/auth/oauth/github">연습용 GitHub 로그인</a> — 실제 GitHub로 나가지 않고 이 서버가 데모 세션만 만듭니다.</p>
+      </section>
+    </template>
+    <template x-if="route.name === 'notfound'">
+      <section>
+        <h1>페이지를 찾을 수 없습니다</h1>
+        <a href="#/posts">목록으로</a>
+      </section>
+    </template>
+  </main>
+</body>
+</html>

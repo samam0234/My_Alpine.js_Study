@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>study2 컴포넌트</title>
+  <link rel="stylesheet" href="/css/app.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.17.5/dist/cdn.min.js"></script>
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('boardShell', () => ({
+        posts: [
+          { id: 1, title: '공지', published: true },
+          { id: 2, title: '초안', published: false }
+        ],
+        pickedId: null,
+        pick(id) { this.pickedId = id }
+      }))
+      Alpine.data('dropdown', () => ({
+        open: false,
+        toggle() { this.open = !this.open },
+        close() { this.open = false }
+      }))
+      Alpine.data('tabs', () => ({
+        names: ['설명', '댓글'],
+        current: '설명',
+        select(name) { this.current = name }
+      }))
+      Alpine.data('modal', () => ({
+        open: false,
+        show() { this.open = true },
+        hide() { this.open = false }
+      }))
+    })
+  </script>
+</head>
+<body x-data="boardShell" x-cloak>
+  <div x-data="dropdown" @click.outside="close()">
+    <button type="button" @click="toggle()">글 목록 열기</button>
+    <div class="card" x-show="open">
+      <template x-for="post in posts" :key="post.id">
+        <div>
+          <template x-if="post.published">
+            <button type="button" @click="$dispatch('picked', post.id); close()" x-text="post.title"></button>
+          </template>
+        </div>
+      </template>
+    </div>
+  </div>
+  <p @picked.window="pick($event.detail)">고른 글 id: <span x-text="pickedId ?? '없음'"></span></p>
+  <div x-data="tabs">
+    <template x-for="name in names" :key="name">
+      <button type="button" @click="select(name)" :aria-selected="String(current === name)" x-text="name"></button>
+    </template>
+    <template x-if="current === '설명'"><p>설명 패널</p></template>
+    <template x-if="current === '댓글'"><p>댓글 패널</p></template>
+  </div>
+  <div x-data="modal">
+    <button type="button" @click="show()">모달 열기</button>
+    <template x-if="open">
+      <div class="card" role="dialog" aria-modal="true">
+        <p>모달 내용</p>
+        <button type="button" @click="hide()">닫기</button>
+      </div>
+    </template>
+  </div>
+</body>
+</html>

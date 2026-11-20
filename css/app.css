@@ -1,0 +1,17 @@
+[x-cloak] { display: none !important; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", sans-serif; color: #1c1917; background: #faf7f2; }
+body[data-theme="dark"] { background: #1c1917; color: #faf7f2; }
+header, main { width: min(760px, calc(100% - 2rem)); margin: 0 auto; }
+header { display: flex; gap: 0.75rem; align-items: center; padding: 1rem 0; }
+a { color: inherit; }
+button, input, textarea { font: inherit; }
+input, textarea { width: 100%; padding: 0.5rem; border: 1px solid #a8a29e; border-radius: 6px; background: transparent; color: inherit; }
+button, .button { border: 0; border-radius: 6px; padding: 0.45rem 0.8rem; background: #0f766e; color: white; cursor: pointer; }
+button[disabled] { opacity: 0.6; cursor: default; }
+article, form, .card { background: white; border-radius: 10px; padding: 1rem; margin: 0.75rem 0; }
+body[data-theme="dark"] article, body[data-theme="dark"] form, body[data-theme="dark"] .card { background: #292524; }
+.error { color: #b91c1c; }
+.row { display: flex; gap: 0.5rem; align-items: center; }
+label { display: block; margin: 0.6rem 0; }
+pre { white-space: pre-wrap; }
